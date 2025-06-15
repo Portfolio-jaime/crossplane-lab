@@ -1,0 +1,14 @@
+# s3-bucket.yaml (Versión que debes usar)
+apiVersion: s3.aws.upbound.io/v1beta1
+kind: Bucket
+metadata:
+  # ESTE es el nombre que tendrá tu bucket en AWS.
+  # ¡Asegúrate de que sea globalmente único!
+  # He añadido tu nombre para ayudar a que sea único.
+  name: s3-crossplane-lab-jaime
+spec:
+  forProvider:
+    # La línea 'bucket: ...' ha sido eliminada de aquí.
+    region: us-east-1
+  providerConfigRef:
+    name: default
