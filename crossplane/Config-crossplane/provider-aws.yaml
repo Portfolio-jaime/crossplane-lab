@@ -1,7 +1,9 @@
-# provider-aws.yaml
+# provider-aws.yaml (Versión actualizada y correcta)
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  name: provider-aws-s3
+  # Puedes cambiar el nombre si quieres, o dejarlo así
+  name: provider-aws
 spec:
-  package: xpkg.upbound.io/upbound/provider-aws-s3:v1.3.0
+  # Usamos el provider que contiene EC2, S3, RDS, etc.
+  package: xpkg.upbound.io/upbound/provider-aws:v1.4.0

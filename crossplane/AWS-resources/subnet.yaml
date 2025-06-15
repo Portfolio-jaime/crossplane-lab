@@ -1,0 +1,17 @@
+# subnet.yaml
+apiVersion: ec2.aws.upbound.io/v1beta1
+kind: Subnet
+metadata:
+  name: crossplane-lab-subnet
+spec:
+  forProvider:
+    region: us-east-1
+    # Referencia al recurso VPC por su nombre en Kubernetes
+    vpcIdRef:
+      name: crossplane-lab-vpc
+    cidrBlock: 10.0.1.0/24
+    availabilityZone: us-east-1a
+    tags:
+      Name: "crossplane-lab-subnet"
+  providerConfigRef:
+    name: default

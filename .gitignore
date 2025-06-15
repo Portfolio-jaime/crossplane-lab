@@ -1,0 +1,45 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Ignore node_modules and dependencies
+node_modules/
+dist/
+build/
+
+# Ignore Kubernetes manifests generated dynamically
+*.yaml~
+*.bak
+
+# Ignore Docker-related files
+docker-compose.override.yml
+.env
+
+# Ignore Python cache files (if applicable)
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore VS Code settings
+.vscode/
+*.code-workspace
+
+# Ignore Dev Container settings
+.devcontainer/
+
+# Ignore AWS credentials
+.aws/
+~/.aws/credentials
+
+# Ignore Helm chart dependencies
+charts/
+*.tgz
+
+# Ignore Minikube files (if used)
+minikube/

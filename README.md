@@ -1,50 +1,50 @@
-# Laboratorio Crossplane con Dev Containers 🚀
+# Crossplane Lab with Dev Containers 🚀
 
-Este laboratorio práctico te enseñará los fundamentos de **Crossplane**, una herramienta de plano de control de código abierto que permite gestionar infraestructura y servicios en la nube directamente desde la API de Kubernetes. Todo se ejecutará en un entorno de desarrollo en contenedor (*Dev Container*) para garantizar una experiencia limpia, reproducible y aislada.
-
----
-
-## 📋 Objetivo Principal
-
-Aprovisionar, gestionar y eliminar un bucket S3, una VPC y una Subnet en AWS utilizando manifiestos de Kubernetes.
+This hands-on lab will teach you the fundamentals of **Crossplane**, an open-source control plane tool that allows you to manage cloud infrastructure and services directly from the Kubernetes API. Everything will run in a containerized development environment (*Dev Container*) to ensure a clean, reproducible, and isolated experience.
 
 ---
 
-## 🏗️ Diagrama de Arquitectura
+## 📋 Main Objective
+
+Provision, manage, and delete an S3 bucket, a VPC, and a Subnet in AWS using Kubernetes manifests.
+
+---
+
+## 🏗️ Architecture Diagram
 
 ```mermaid
 graph TD
-    subgraph "Máquina Local (Host)"
+    subgraph "Local Machine (Host)"
         A[VS Code] --> B{Dev Container};
-        C[Docker Desktop] --> B;
-        D[~/.aws/credentials] -.->|Montado en| B;
+        C[Docker Daemon] --> B;
     end
 
     subgraph "🐳 Dev Container: crossplane-lab"
-        B --> E[Terminal de VS Code];
+        B --> E[VS Code Terminal];
         E --> F[kubectl];
         E --> G[Helm];
-        E --> H[Kind];
-        H -- Despliega --> I[Clúster de Kubernetes];
+        E --> H[Minikube];
+        H -- Deploys --> I[Kubernetes Cluster];
+        D[~/.aws/credentials] -.->|Mounted inside| B;
     end
 
-    subgraph "☸️ Clúster de Kubernetes (en Kind)"
+    subgraph "☸️ Kubernetes Cluster (in Minikube)"
         I --> J[Crossplane];
         J --> K[Provider AWS];
     end
 
     subgraph "☁️ Amazon Web Services"
-        L[Bucket S3];
+        L[S3 Bucket];
         M[VPC];
         N[Subnet];
         M --> N;
     end
 
-    F -- Aplica Manifiestos --> J;
-    K -- Autentica con --> D;
-    K -- Aprovisiona/Gestiona --> L;
-    K -- Aprovisiona/Gestiona --> M;
-    K -- Aprovisiona/Gestiona --> N;
+    F -- Applies Manifests --> J;
+    K -- Authenticates using --> D;
+    K -- Provisions/Manages --> L;
+    K -- Provisions/Manages --> M;
+    K -- Provisions/Manages --> N;
 
     style B fill:#2496ed,stroke:#333,stroke-width:2px,color:#fff
     style I fill:#326ce5,stroke:#333,stroke-width:2px,color:#fff
@@ -56,180 +56,189 @@ graph TD
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📂 Project Structure
 
-La estructura de archivos está diseñada para ser modular y clara:
+The file structure is designed to be modular and clear:
 
 ```
 crossplane-lab/
 ├── .devcontainer/
-│   ├── devcontainer.json       # 🧠 Configuración del entorno Dev Container.
-│   ├── docker-compose.yml      # 🏗️ Define servicios y volúmenes.
-│   ├── Dockerfile              # 📦 Construye la imagen base con herramientas necesarias.
+│   ├── crossplane-lab.code-workspace   # VS Code workspace configuration
+│   ├── devcontainer.json              # Dev Container configuration
+│   ├── docker-compose.yml             # Docker Compose file for the environment
+│   ├── Dockerfile                     # Dockerfile for building the container
 ├── crossplane/
-│   ├── provider-aws.yaml       # Manifiesto para instalar el Provider de AWS.
-│   ├── provider-config-aws.yaml# Configuración de autenticación del Provider.
-│   ├── s3-bucket.yaml          # Manifiesto para aprovisionar el bucket S3.
-│   ├── vpc.yaml                # Manifiesto para aprovisionar la VPC.
-│   ├── subnet.yaml             # Manifiesto para aprovisionar la Subnet.
-└── README.md                   # 📖 Documentación del laboratorio.
+│   ├── AWS-resources/
+│   │   ├── s3-bucket.yaml             # Manifest for provisioning the S3 bucket
+│   │   ├── subnet.yaml                # Manifest for provisioning the Subnet
+│   │   ├── vpc.yaml                   # Manifest for provisioning the VPC
+│   ├── Config-crossplane/
+│   │   ├── provider-aws.yaml          # Manifest for installing the AWS Provider
+│   │   ├── provider-config-aws.yaml   # Configuration for authenticating the AWS Provider
+├── README.md                          # Documentation for the lab
+├── .gitignore                         # Git ignore file
 ```
 
 ---
 
-## 🚀 Guía de Implementación Paso a Paso
+## 🚀 Step-by-Step Implementation Guide
 
-### ✅ Paso 0: Prerrequisitos en tu Máquina Host
+### ✅ Step 0: Prerequisites on Your Host Machine
 
-1. **Docker Desktop** instalado y en ejecución.
-2. **Visual Studio Code** con la extensión *Remote - Containers*.
-3. **Credenciales de AWS** configuradas localmente:
+1. **Docker Desktop** installed and running.
+2. **Visual Studio Code** with the *Remote - Containers* extension.
+3. **AWS credentials** configured locally:
    ```bash
    aws configure
    ```
-   Asegúrate de tener tu archivo `~/.aws/credentials` configurado.
+   Ensure your `~/.aws/credentials` file is properly set up.
 
 ---
 
-### 🛠️ Paso 1: Iniciar el Entorno y Configurar Credenciales
+### 🛠️ Step 1: Start the Environment and Configure Credentials
 
-1. **Abrir el Proyecto**: Abre esta carpeta en VS Code.
-2. **Lanzar el Dev Container**: Haz clic en "Reopen in Container".
-3. **Configurar AWS CLI dentro del Contenedor**:
+1. **Open the Project**: Open this folder in VS Code.
+2. **Launch the Dev Container**: Click "Reopen in Container."
+3. **Configure AWS CLI inside the Container**:
    ```bash
    aws configure
    ```
-   Introduce tu Access Key ID y Secret Access Key.
+   Enter your Access Key ID and Secret Access Key.
 
 ---
 
-### ☸️ Paso 2: Preparación del Clúster de Kubernetes
+### ☸️ Step 2: Prepare the Kubernetes Cluster
 
-1. **Crear el clúster con Kind**:
+1. **Start Minikube**:
    ```bash
-   kind create cluster --name crossplane-lab
+   minikube start
    ```
-   Esto configurará automáticamente `kubectl` para apuntar al nuevo clúster.
+   This will automatically configure `kubectl` to point to the new cluster.
 
-2. **Verificar la conexión**:
+2. **Verify the connection**:
    ```bash
    kubectl get nodes
    ```
-   Espera a que el `STATUS` cambie a `Ready`.
+   Wait for the `STATUS` to change to `Ready`.
 
 ---
 
-### 🧩 Paso 3: Instalación y Configuración de Crossplane
+### 🧩 Step 3: Install and Configure Crossplane
 
-1. **Añadir el repositorio de Helm**:
+1. **Add the Helm repository**:
    ```bash
    helm repo add crossplane-stable https://charts.crossplane.io/stable
    helm repo update
    ```
 
-2. **Instalar Crossplane**:
+2. **Install Crossplane**:
    ```bash
    helm install crossplane --namespace crossplane-system --create-namespace crossplane-stable/crossplane
    ```
 
-3. **Verificar los Pods de Crossplane**:
+3. **Verify Crossplane Pods**:
    ```bash
    kubectl get pods -n crossplane-system -w
    ```
 
-4. **Instalar el Provider de AWS**:
+4. **Install the AWS Provider**:
    ```bash
    kubectl apply -f crossplane/provider-aws.yaml
    ```
 
-5. **Esperar a que el Provider esté saludable**:
+5. **Wait for the Provider to be healthy**:
    ```bash
    kubectl get provider.pkg.crossplane.io -w
    ```
 
-6. **Crear el Secreto de Kubernetes para las Credenciales**:
+6. **Create the Kubernetes Secret for AWS Credentials**:
    ```bash
    kubectl create secret generic aws-secret -n crossplane-system --from-file=creds=/home/arheanja/.aws/credentials
    ```
 
-7. **Aplicar la Configuración del Provider**:
+7. **Apply the Provider Configuration**:
    ```bash
    kubectl apply -f crossplane/provider-config-aws.yaml
    ```
 
 ---
 
-### 🪣 Paso 4: Aprovisionamiento del Bucket S3
+### 🪣 Step 4: Provision the S3 Bucket
 
-1. **Editar el manifiesto `s3-bucket.yaml`**:
-   Asegúrate de que el nombre del bucket sea único globalmente:
+1. **Edit the `s3-bucket.yaml` manifest**:
+   Ensure the bucket name is globally unique:
    ```yaml
    metadata:
-     name: mi-bucket-unico-crossplane-jaime-20250616
+     name: my-unique-crossplane-bucket-jaime-20250616
    ```
 
-2. **Aplicar el manifiesto**:
+2. **Apply the manifest**:
    ```bash
    kubectl apply -f crossplane/s3-bucket.yaml
    ```
 
-3. **Verificar el estado del recurso Bucket**:
+3. **Check the Bucket resource status**:
    ```bash
    kubectl get bucket -w
    ```
 
-4. **Confirmar en la Consola de AWS**: Inicia sesión en tu cuenta de AWS y verifica que el bucket existe.
+4. **Confirm in the AWS Console**: Log in to your AWS account and verify the bucket exists.
 
 ---
 
-### 🌐 Paso 5: Expandiendo con una VPC y Subnet
+### 🌐 Step 5: Expand with a VPC and Subnet
 
-1. **Crear y aplicar el manifiesto `vpc.yaml`**:
+1. **Create and apply the `vpc.yaml` manifest**:
    ```bash
    kubectl apply -f crossplane/vpc.yaml
    ```
 
-2. **Crear y aplicar el manifiesto `subnet.yaml`**:
+2. **Create and apply the `subnet.yaml` manifest**:
    ```bash
    kubectl apply -f crossplane/subnet.yaml
    ```
 
-3. **Verificar los recursos**:
+3. **Verify the resources**:
    ```bash
    kubectl get vpc
    kubectl get subnet
    ```
 
-4. **Confirmar en la Consola de AWS**: Verifica los recursos en el servicio VPC.
+4. **Confirm in the AWS Console**: Verify the resources in the VPC service.
 
 ---
 
-### 🧹 Paso 6: Limpieza de Recursos
+### 🧹 Step 6: Clean Up Resources
 
-1. **Eliminar la Subnet**:
+1. **Delete the Subnet**:
    ```bash
    kubectl delete -f crossplane/subnet.yaml
    ```
 
-2. **Eliminar la VPC**:
+2. **Delete the VPC**:
    ```bash
    kubectl delete -f crossplane/vpc.yaml
    ```
 
-3. **Eliminar el bucket S3**:
+3. **Delete the S3 Bucket**:
    ```bash
    kubectl delete -f crossplane/s3-bucket.yaml
    ```
 
-4. **Eliminar el clúster de Kind**:
+4. **Stop Minikube**:
    ```bash
-   kind delete cluster --name crossplane-lab
+   minikube stop
    ```
 
-5. **Cerrar el Dev Container**: Haz clic en el botón verde en la esquina inferior izquierda de VS Code y selecciona "Close Remote Connection".
+5. **Close the Dev Container**: Click the green button in the bottom-left corner of VS Code and select "Close Remote Connection."
 
 ---
 
-## 📝 Notas Finales
+## 📝 Final Notes
 
-Este laboratorio está diseñado para ser reproducible y aislado, garantizando que puedas experimentar con Crossplane sin afectar tu máquina local. ¡Disfruta aprendiendo y creando infraestructura en la nube con Kubernetes y Crossplane!
+This lab is designed to be reproducible and isolated, ensuring you can experiment with Crossplane without affecting your local machine. Enjoy learning and creating cloud infrastructure with Kubernetes and Crossplane!
+
+---
+
+**Jaime A. Henao
+Devops
