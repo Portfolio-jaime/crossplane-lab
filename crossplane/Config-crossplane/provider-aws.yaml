@@ -1,9 +1,29 @@
-# provider-aws.yaml (Versión actualizada y correcta)
+# crossplane/Config-crossplane/provider-aws.yaml (Versión Final y Correcta)
+# Configuración del proveedor para múltiples recursos de AWS
+
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
 metadata:
-  # Puedes cambiar el nombre si quieres, o dejarlo así
-  name: provider-aws
+  # Nombramos al proveedor por lo que es
+  name: provider-aws-ec2
 spec:
-  # Usamos el provider que contiene EC2, S3, RDS, etc.
-  package: xpkg.upbound.io/upbound/provider-aws:v1.4.0
+  # Este paquete solo contiene los recursos de EC2 (VPC, Subnet, etc.)
+  package: xpkg.upbound.io/upbound/provider-aws-ec2:v1.4.0
+
+---
+
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-s3
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-s3:v1.4.0
+
+---
+
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws-rds
+spec:
+  package: xpkg.upbound.io/upbound/provider-aws-rds:v1.4.0

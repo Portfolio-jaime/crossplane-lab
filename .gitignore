@@ -43,3 +43,7 @@ charts/
 
 # Ignore Minikube files (if used)
 minikube/
+
+# Archivos sensibles y claves privadas
+.env
+crossplane-lab-keypair.pem
