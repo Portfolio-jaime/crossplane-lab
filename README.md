@@ -23,9 +23,10 @@ flowchart TD
     I --> J[Crossplane]:::crossplane
     J --> K[Provider AWS]:::aws
     K --> L[VPC]:::awsres
-    L --> M[Subnet]:::awsres
-    M --> N[EC2 Instance]:::awsres
+    K --> M[Subnet]:::awsres
+    K --> N[EC2 Instance]:::awsres
     K --> O[S3 Bucket]:::awsres
+    N -. Utiliza .-> M
 
     %% Colores
     classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
