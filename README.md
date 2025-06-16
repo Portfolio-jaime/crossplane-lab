@@ -15,7 +15,7 @@ Proveer, gestionar y eliminar servicios de AWS (EC2, S3, VPC, Subnet) utilizando
 ```mermaid
 flowchart TD
     A[VS Code]:::vscode --> B{Dev Container}:::devcontainer
-    D1[~/.aws/credentials]:::cred -.-> B
+    B --> D1[~/.aws/credentials]:::cred
     B --> C[Terminal]:::terminal
     B --> D[Docker CLI]:::docker
     D --> H[Docker Daemon]:::docker
