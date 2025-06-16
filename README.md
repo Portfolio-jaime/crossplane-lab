@@ -19,14 +19,14 @@ flowchart TD
     B --> C[Terminal]:::terminal
     B --> D[Docker CLI]:::docker
     D --> H[Docker Daemon]:::docker
-    C --> I[Kubernetes Cluster (kind)]:::k8s
+    C --> I[Kubernetes Cluster<br/>kind]:::k8s
     I --> J[Crossplane]:::crossplane
     J --> K[Provider AWS]:::aws
     K --> L[VPC]:::awsres
     L --> M[Subnet]:::awsres
     K --> N[EC2 Instance]:::awsres
     K --> O[S3 Bucket]:::awsres
-    N -. Utiliza .-> M
+    N -.->|Uses| M
 
     %% Colores
     classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
