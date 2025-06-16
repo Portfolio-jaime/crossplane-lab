@@ -1,49 +1,48 @@
-# Crossplane Lab with Dev Containers
+# Crossplane Lab con Dev Containers
 
-This lab demonstrates how to manage AWS infrastructure (EC2 instance, S3 bucket, VPC, and Subnet) using Crossplane directly from Kubernetes manifests. The dev container setup provides an isolated, reproducible environment.
-
----
-
-## Main Objective
-• Provision, manage, and remove AWS services (EC2, S3, VPC, Subnet) using Kubernetes manifests.
+Este laboratorio demuestra cómo administrar infraestructura de AWS (instancia EC2, bucket S3, VPC y Subnet) usando **Crossplane** a través de manifiestos de Kubernetes. El entorno de _Dev Container_ provee un espacio aislado y reproducible.
 
 ---
 
-## Architecture Diagram
+## Objetivo Principal
+
+Proveer, gestionar y eliminar servicios de AWS (EC2, S3, VPC, Subnet) utilizando manifiestos de Kubernetes.
+
+---
+
+## Diagrama de Arquitectura
 
 ```mermaid
-graph TD
-    subgraph "Local Machine (Host)"
-        A[VS Code] --> B{Dev Container};
-        C[Docker Daemon] --> B;
-    end
-    subgraph "Dev Container: crossplane-lab"
-        B --> E[VS Code Terminal];
-        E --> F[kubectl];
-        E --> G[Helm];
-        E --> H[Kind];
-        H -- Deploy --> I[Kubernetes Cluster];
-        D[~/.aws/credentials] -.->|Mounted| B;
-    end
-    subgraph "Kubernetes Cluster (Kind)"
-        I --> J[Crossplane];
-        J --> K[Provider AWS];
-    end
-    subgraph "AWS Cloud"
-        L[EC2 Instance];
-        M[S3 Bucket];
-        N[VPC];
-        O[Subnet];
-        N --> O;
-    end
-    F -- Apply Manifests --> J;
-    K -- Auth via --> D;
-    K -- Manages --> L & M & N & O;
+flowchart TD
+    A[VS Code]:::vscode --> B{Dev Container}:::devcontainer
+    B --> C[Terminal de VS Code]:::terminal
+    C --> D[kubectl]:::cli
+    C --> E[Helm]:::cli
+    C --> F[Kind]:::cli
+    F -- Crea --> G[Kubernetes Cluster]:::k8s
+    G --> H[Crossplane]:::crossplane
+    H --> I[Provider AWS]:::aws
+    I -- Provee/Gestiona --> J[Instancia EC2]:::awsres
+    I -- Provee/Gestiona --> K[S3 Bucket]:::awsres
+    I -- Provee/Gestiona --> L[VPC]:::awsres
+    I -- Provee/Gestiona --> M[Subnet]:::awsres
+
+    style A fill:#1c1c1c,stroke:#fff,stroke-width:1px,color:#fff
+    classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
+    classDef devcontainer fill:#229977,stroke:#333,stroke-width:1px,color:#fff
+    classDef terminal fill:#727272,stroke:#333,stroke-width:1px,color:#fff
+    classDef cli fill:#154360,stroke:#333,stroke-width:1px,color:#fff
+    classDef k8s fill:#326ce5,stroke:#333,stroke-width:1px,color:#fff
+    classDef crossplane fill:#1694f5,stroke:#333,stroke-width:1px,color:#fff
+    classDef aws fill:#ee6b2f,stroke:#333,stroke-width:1px,color:#fff
+    classDef awsres fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
 ```
+
+En este diagrama se observa cómo VS Code (a través de un Dev Container) interactúa con herramientas como `kubectl`, `Helm` y `Kind` para crear un clúster de Kubernetes en el cual se instala Crossplane con el proveedor de AWS. Dicho proveedor maneja la creación de recursos como instancia EC2, bucket S3, VPC y Subnet directamente en AWS.
 
 ---
 
-## Project Structure
+## Estructura del Proyecto
 
 ```
 crossplane-lab/
@@ -70,79 +69,95 @@ crossplane-lab/
 
 ---
 
-## Setup Steps
+## Guía Paso a Paso
 
-### 1. Prerequisites  
-• Docker Desktop running.  
-• VS Code with the Remote - Containers extension.  
-• AWS credentials set up locally with `aws configure`.
+### 1. Prerrequisitos en tu Máquina (Host)
+1. **Docker Desktop** en ejecución.  
+2. **Visual Studio Code** con la extensión *Remote - Containers*.  
+3. **Credenciales de AWS** configuradas localmente con:
+   ```bash
+   aws configure
+   ```
+   Asegúrate de que tu archivo `~/.aws/credentials` esté correcto.
 
-### 2. Start Environment and Configure Credentials  
-1. Open this folder in VS Code.  
-2. Select “Reopen in Container” to launch the dev container.  
-3. Inside the container, configure AWS:  
+### 2. Iniciar el Entorno y Configurar Credenciales
+1. Abre esta carpeta (`crossplane-lab`) en VS Code.  
+2. Elige **"Reopen in Container"** para iniciar el Dev Container que ya trae Docker, Kubernetes CLI, Helm y otras herramientas.  
+3. Dentro del contenedor, configura AWS si lo deseas:
    ```bash
    aws configure
    ```
 
-### 3. Prepare Kubernetes Cluster  
-1. Create a Kind cluster:  
+### 3. Preparar el Clúster de Kubernetes
+1. Crea el clúster con Kind:
    ```bash
    make cluster
-   ```  
-2. Check nodes:  
+   ```
+2. Verifica los nodos:
    ```bash
    kubectl get nodes
    ```
+   Deberás ver un nodo en estado `Ready`.
 
-### 4. Install Crossplane and Configure AWS  
-1. Install Crossplane:  
+### 4. Instalar Crossplane y Configurar AWS
+1. Instala **Crossplane**:
    ```bash
    make install-crossplane
-   ```  
-2. Create AWS secret:  
+   ```
+2. Crea el secreto de AWS para las credenciales:
    ```bash
    make setup-aws
-   ```  
-3. Apply provider manifests:  
+   ```
+3. Aplica la configuración de proveedores:
    ```bash
    make apply-resources
    ```
 
-### 5. Create Key Pair and Apply EC2  
-1. Generate key pair:  
+### 5. Crear el Par de Claves y Aplicar el Recurso EC2
+1. Genera el par de claves en AWS:
    ```bash
    make create-keypair
-   ```  
-2. Apply the EC2 manifest:  
+   ```
+2. Aplica el manifiesto de EC2:
    ```bash
    make apply-ec2
    ```
+3. Verifica el estado del recurso:
+   ```bash
+   kubectl get instances.ec2.aws.upbound.io -o wide
+   ```
 
-### 6. Optional: Provision Other AWS Resources  
-```bash
-kubectl apply -f crossplane/AWS-resources/s3-bucket.yaml
-kubectl apply -f crossplane/AWS-resources/vpc.yaml
-kubectl apply -f crossplane/AWS-resources/subnet.yaml
-```
+### 6. (Opcional) Provisionar Otros Recursos
+1. **Bucket S3**:
+   ```bash
+   kubectl apply -f crossplane/AWS-resources/s3-bucket.yaml
+   ```
+2. **VPC**:
+   ```bash
+   kubectl apply -f crossplane/AWS-resources/vpc.yaml
+   ```
+3. **Subnet**:
+   ```bash
+   kubectl apply -f crossplane/AWS-resources/subnet.yaml
+   ```
 
-### 7. Clean Up  
-1. Remove resources individually:  
+### 7. Limpieza
+1. Eliminar recursos individualmente:
    ```bash
    kubectl delete -f crossplane/AWS-resources/<resource-file>.yaml
-   ```  
-2. Remove the cluster:  
+   ```
+2. Eliminar el clúster:
    ```bash
    make clean
    ```
 
 ---
 
-## Final Notes
-This lab is designed to be fully reproducible and isolated so you can explore Crossplane without impacting your local setup. If any issues arise, check the Crossplane pod logs:
+## Notas Finales
+Este laboratorio está diseñado para ser completamente reproducible y aislado, para que puedas explorar Crossplane sin afectar tu configuración local. Si surge algún problema, verifica los registros de los pods de Crossplane:
 
 ```bash
 kubectl logs -n crossplane-system <pod-name>
 ```
 
-Enjoy learning about infrastructure management with Kubernetes and Crossplane!
+¡Disfruta aprendiendo sobre la gestión de infraestructura con Kubernetes y Crossplane!
