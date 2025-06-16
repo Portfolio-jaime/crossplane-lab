@@ -14,42 +14,18 @@ Proveer, gestionar y eliminar servicios de AWS (EC2, S3, VPC, Subnet) utilizando
 
 ```mermaid
 flowchart TD
-    subgraph Local_Machine
-        A[VS Code]:::vscode
-        D1[~/.aws/credentials]:::cred
-    end
-    subgraph Dev_Container
-        B{Dev Container}:::devcontainer
-        C[Terminal]:::terminal
-        D[Docker CLI]:::docker
-    end
-    subgraph Docker
-        H[Docker Daemon]:::docker
-    end
-    subgraph Kubernetes
-        I[Kubernetes Cluster (Kind)]:::k8s
-        J[Crossplane]:::crossplane
-        K[Provider AWS]:::aws
-    end
-    subgraph AWS_Cloud
-        L[VPC]:::awsres
-        M[Subnet]:::awsres
-        N[EC2 Instance]:::awsres
-        O[S3 Bucket]:::awsres
-    end
-
-    A --> B
-    D1 -.-> B
-    B --> C
-    B --> D
-    D --> H
-    C --> I
-    I --> J
-    J --> K
-    K --> L
-    L --> M
-    M --> N
-    K --> O
+    A[VS Code]:::vscode --> B{Dev Container}:::devcontainer
+    D1[~/.aws/credentials]:::cred -.-> B
+    B --> C[Terminal]:::terminal
+    B --> D[Docker CLI]:::docker
+    D --> H[Docker Daemon]:::docker
+    C --> I[Kubernetes Cluster]:::k8s
+    I --> J[Crossplane]:::crossplane
+    J --> K[Provider AWS]:::aws
+    K --> L[VPC]:::awsres
+    L --> M[Subnet]:::awsres
+    M --> N[EC2 Instance]:::awsres
+    K --> O[S3 Bucket]:::awsres
 
     %% Colores
     classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
