@@ -28,6 +28,7 @@ flowchart TD
     I -- Provee/Gestiona --> M[Subnet]:::awsres
 
     style A fill:#1c1c1c,stroke:#fff,stroke-width:1px,color:#fff
+
     classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
     classDef devcontainer fill:#229977,stroke:#333,stroke-width:1px,color:#fff
     classDef terminal fill:#727272,stroke:#333,stroke-width:1px,color:#fff
