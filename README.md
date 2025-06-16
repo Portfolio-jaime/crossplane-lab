@@ -1,6 +1,6 @@
 # Crossplane Lab con Dev Containers
 
-Este laboratorio demuestra cómo administrar infraestructura de AWS (instancia EC2, bucket S3, VPC y Subnet) usando **Crossplane** a través de manifiestos de Kubernetes. El entorno de _Dev Container_ provee un espacio aislado y reproducible.
+Este laboratorio demuestra cómo administrar infraestructura de AWS (instancia EC2, bucket S3, VPC y Subnet) usando **Crossplane** a través de manifiestos de Kubernetes. El entorno de _Dev Container_ provee un espacio aislado y reproducible, utilizando Docker y Kubernetes dentro del contenedor.
 
 ---
 
@@ -15,28 +15,40 @@ Proveer, gestionar y eliminar servicios de AWS (EC2, S3, VPC, Subnet) utilizando
 ```mermaid
 flowchart TD
     A[VS Code]:::vscode --> B{Dev Container}:::devcontainer
+    A -. Lee/Monta .aws/credentials .-> D1[~/.aws/credentials]:::cred
+    D1 -.-> B
     B --> C[Terminal de VS Code]:::terminal
-    C --> D[kubectl]:::cli
-    C --> E[Helm]:::cli
-    C --> F[Kind]:::cli
-    F -- Crea --> G[Kubernetes Cluster]:::k8s
-    G --> H[Crossplane]:::crossplane
-    H --> I[Provider AWS]:::aws
-    I -- Provee/Gestiona --> J[Instancia EC2]:::awsres
-    I -- Provee/Gestiona --> K[S3 Bucket]:::awsres
-    I -- Provee/Gestiona --> L[VPC]:::awsres
-    I -- Provee/Gestiona --> M[Subnet]:::awsres
+    B --> D[Docker CLI]:::docker
+    C --> E[kubectl]:::cli
+    C --> F[Helm]:::cli
+    C --> G[Kind]:::cli
+    D --> H[Docker Daemon]:::docker
+    G -- Crea --> I[Kubernetes Cluster]:::k8s
+    I --> J[Crossplane]:::crossplane
+    J --> K[Provider AWS]:::aws
+    K -- Provee/Gestiona --> L[VPC]:::awsres
+    L -- Contiene --> M[Subnet]:::awsres
+    M -- Es usada por --> N[Instancia EC2]:::awsres
+    K -- Provee/Gestiona --> O[S3 Bucket]:::awsres
 
-    style A fill:#1c1c1c,stroke:#fff,stroke-width:1px,color:#fff
-
-    classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
-    classDef devcontainer fill:#229977,stroke:#333,stroke-width:1px,color:#fff
-    classDef terminal fill:#727272,stroke:#333,stroke-width:1px,color:#fff
-    classDef cli fill:#154360,stroke:#333,stroke-width:1px,color:#fff
-    classDef k8s fill:#326ce5,stroke:#333,stroke-width:1px,color:#fff
-    classDef crossplane fill:#1694f5,stroke:#333,stroke-width:1px,color:#fff
-    classDef aws fill:#ee6b2f,stroke:#333,stroke-width:1px,color:#fff
-    classDef awsres fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
+    style A fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
+    style B fill:#229977,stroke:#333,stroke-width:1px,color:#fff
+    style C fill:#727272,stroke:#333,stroke-width:1px,color:#fff
+    style D fill:#2496ed,stroke:#333,stroke-width:1px,color:#fff
+    style D1 fill:#f7e018,stroke:#333,stroke-width:1px,color:#000
+    style E fill:#154360,stroke:#333,stroke-width:1px,color:#fff
+    style F fill:#154360,stroke:#333,stroke-width:1px,color:#fff
+    style G fill:#154360,stroke:#333,stroke-width:1px,color:#fff
+    style H fill:#384d54,stroke:#333,stroke-width:1px,color:#fff
+    style I fill:#326ce5,stroke:#333,stroke-width:1px,color:#fff
+    style J fill:#1694f5,stroke:#333,stroke-width:1px,color:#fff
+    style K fill:#ee6b2f,stroke:#333,stroke-width:1px,color:#fff
+    style L fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
+    style M fill:#ffe082,stroke:#333,stroke-width:1px,color:#000
+    style N fill:#ffb300,stroke:#333,stroke-width:1px,color:#000
+    style O fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
+    classDef cred fill:#f7e018,stroke:#333,stroke-width:1px,color:#000
+    classDef docker fill:#384d54,stroke:#333,stroke-width:1px,color:#fff
 ```
 
 En este diagrama se observa cómo VS Code (a través de un Dev Container) interactúa con herramientas como `kubectl`, `Helm` y `Kind` para crear un clúster de Kubernetes en el cual se instala Crossplane con el proveedor de AWS. Dicho proveedor maneja la creación de recursos como instancia EC2, bucket S3, VPC y Subnet directamente en AWS.
