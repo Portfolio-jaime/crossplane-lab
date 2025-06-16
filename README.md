@@ -14,41 +14,53 @@ Proveer, gestionar y eliminar servicios de AWS (EC2, S3, VPC, Subnet) utilizando
 
 ```mermaid
 flowchart TD
-    A[VS Code]:::vscode --> B{Dev Container}:::devcontainer
-    A -. Lee/Monta .aws/credentials .-> D1[~/.aws/credentials]:::cred
-    D1 -.-> B
-    B --> C[Terminal de VS Code]:::terminal
-    B --> D[Docker CLI]:::docker
-    C --> E[kubectl]:::cli
-    C --> F[Helm]:::cli
-    C --> G[Kind]:::cli
-    D --> H[Docker Daemon]:::docker
-    G -- Crea --> I[Kubernetes Cluster]:::k8s
-    I --> J[Crossplane]:::crossplane
-    J --> K[Provider AWS]:::aws
-    K -- Provee/Gestiona --> L[VPC]:::awsres
-    L -- Contiene --> M[Subnet]:::awsres
-    M -- Es usada por --> N[Instancia EC2]:::awsres
-    K -- Provee/Gestiona --> O[S3 Bucket]:::awsres
+    subgraph Local_Machine
+        A[VS Code]:::vscode
+        D1[~/.aws/credentials]:::cred
+    end
+    subgraph Dev_Container
+        B{Dev Container}:::devcontainer
+        C[Terminal]:::terminal
+        D[Docker CLI]:::docker
+    end
+    subgraph Docker
+        H[Docker Daemon]:::docker
+    end
+    subgraph Kubernetes
+        I[Kubernetes Cluster (Kind)]:::k8s
+        J[Crossplane]:::crossplane
+        K[Provider AWS]:::aws
+    end
+    subgraph AWS_Cloud
+        L[VPC]:::awsres
+        M[Subnet]:::awsres
+        N[EC2 Instance]:::awsres
+        O[S3 Bucket]:::awsres
+    end
 
-    style A fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
-    style B fill:#229977,stroke:#333,stroke-width:1px,color:#fff
-    style C fill:#727272,stroke:#333,stroke-width:1px,color:#fff
-    style D fill:#2496ed,stroke:#333,stroke-width:1px,color:#fff
-    style D1 fill:#f7e018,stroke:#333,stroke-width:1px,color:#000
-    style E fill:#154360,stroke:#333,stroke-width:1px,color:#fff
-    style F fill:#154360,stroke:#333,stroke-width:1px,color:#fff
-    style G fill:#154360,stroke:#333,stroke-width:1px,color:#fff
-    style H fill:#384d54,stroke:#333,stroke-width:1px,color:#fff
-    style I fill:#326ce5,stroke:#333,stroke-width:1px,color:#fff
-    style J fill:#1694f5,stroke:#333,stroke-width:1px,color:#fff
-    style K fill:#ee6b2f,stroke:#333,stroke-width:1px,color:#fff
-    style L fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
-    style M fill:#ffe082,stroke:#333,stroke-width:1px,color:#000
-    style N fill:#ffb300,stroke:#333,stroke-width:1px,color:#000
-    style O fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
-    classDef cred fill:#f7e018,stroke:#333,stroke-width:1px,color:#000
+    A --> B
+    D1 -.-> B
+    B --> C
+    B --> D
+    D --> H
+    C --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    K --> O
+
+    %% Colores
+    classDef vscode fill:#007acc,stroke:#333,stroke-width:1px,color:#fff
+    classDef devcontainer fill:#229977,stroke:#333,stroke-width:1px,color:#fff
+    classDef terminal fill:#727272,stroke:#333,stroke-width:1px,color:#fff
     classDef docker fill:#384d54,stroke:#333,stroke-width:1px,color:#fff
+    classDef k8s fill:#326ce5,stroke:#333,stroke-width:1px,color:#fff
+    classDef crossplane fill:#1694f5,stroke:#333,stroke-width:1px,color:#fff
+    classDef aws fill:#ee6b2f,stroke:#333,stroke-width:1px,color:#fff
+    classDef awsres fill:#ffc107,stroke:#333,stroke-width:1px,color:#000
+    classDef cred fill:#f7e018,stroke:#333,stroke-width:1px,color:#000
 ```
 
 En este diagrama se observa cómo VS Code (a través de un Dev Container) interactúa con herramientas como `kubectl`, `Helm` y `Kind` para crear un clúster de Kubernetes en el cual se instala Crossplane con el proveedor de AWS. Dicho proveedor maneja la creación de recursos como instancia EC2, bucket S3, VPC y Subnet directamente en AWS.
